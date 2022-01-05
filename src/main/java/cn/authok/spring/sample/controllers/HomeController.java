@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/home")
+@RequestMapping("")
 public class HomeController {
     @GetMapping()
     public String index() {
         return "home";
     }
 
-    @GetMapping("test")
+    @GetMapping("/home")
     public String test() {
         return "test";
     }

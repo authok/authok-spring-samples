@@ -42,8 +42,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .cors()
                     .and()
                 .authorizeRequests()
-                    .mvcMatchers("/", "/home").permitAll()
-                    .mvcMatchers(HttpMethod.GET, "/api/v1/contacts/**").authenticated() //.hasAuthority("SCOPE_read:contacts")
+                    .mvcMatchers("/", "/home", "/login", "/callback").permitAll()
+                    .anyRequest().authenticated()
+                    // .mvcMatchers(HttpMethod.GET, "/api/v1/contacts/**").authenticated() //.hasAuthority("SCOPE_read:contacts")
                     .and()
                 .oauth2ResourceServer()
                     .jwt();
