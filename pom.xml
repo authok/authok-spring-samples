@@ -18,8 +18,7 @@
         <dependency>
             <groupId>cn.authok</groupId>
             <artifactId>authok</artifactId>
-            <version>1.35.0</version>
-            <type>module</type>
+            <version>1.35.1</version>
         </dependency>
         <dependency>
             <groupId>com.auth0</groupId>
