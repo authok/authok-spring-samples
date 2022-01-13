@@ -10,10 +10,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @EnableWebSecurity
@@ -40,6 +45,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf()
                     .disable()
                 .cors()
+                    .and()
+                .logout()
+                    .logoutUrl("/logout")
+                .addLogoutHandler(new LogoutHandler() {
+                    @Override
+                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                        try {
+                            String returnUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
+                            if ((request.getScheme().equals("http") && request.getServerPort() != 80)
+                                    || (request.getScheme().equals("https") && request.getServerPort() != 443)) {
+                                returnUrl += ":" + request.getServerPort();
+                            }
+                            returnUrl += "/login";
+
+                            String logoutUrl = String.format(
+                                    "https://%s/logout?client_id=%s&returnTo=%s",
+                                    domain,
+                                    clientId,
+                                    returnUrl
+                            );
+                            response.sendRedirect(logoutUrl);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
                     .and()
                 .authorizeRequests()
                     .mvcMatchers("/", "/home", "/login", "/callback").permitAll()
