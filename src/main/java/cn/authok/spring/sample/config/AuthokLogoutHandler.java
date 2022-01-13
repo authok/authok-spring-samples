@@ -24,6 +24,8 @@ public class AuthokLogoutHandler extends SecurityContextLogoutHandler {
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        super.logout(request, response, authentication);
+
         String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("home")
                 .build().toString();
