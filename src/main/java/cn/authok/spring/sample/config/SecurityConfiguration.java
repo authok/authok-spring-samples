@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,20 +53,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addLogoutHandler(new LogoutHandler() {
                     @Override
                     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-                        try {
-                            String returnUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
-                            if ((request.getScheme().equals("http") && request.getServerPort() != 80)
-                                    || (request.getScheme().equals("https") && request.getServerPort() != 443)) {
-                                returnUrl += ":" + request.getServerPort();
-                            }
-                            returnUrl += "/login";
+                        String returnUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
+                        if ((request.getScheme().equals("http") && request.getServerPort() != 80)
+                                || (request.getScheme().equals("https") && request.getServerPort() != 443)) {
+                            returnUrl += ":" + request.getServerPort();
+                        }
+                        returnUrl += "/logout_success";
 
-                            String logoutUrl = String.format(
-                                    "https://%s/logout?client_id=%s&returnTo=%s",
-                                    domain,
-                                    clientId,
-                                    returnUrl
-                            );
+                        String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                .path("home")
+                                .build().toString();
+
+                        String logoutUrl =
+                                UriComponentsBuilder.fromHttpUrl(issuer + "logout?client_id={client_id}&return_to={return_to}")
+                                .encode()
+                                .buildAndExpand(clientId, returnUrl)
+                                .toUriString();
+
+                        try {
                             response.sendRedirect(logoutUrl);
                         } catch (IOException e) {
                             e.printStackTrace();
