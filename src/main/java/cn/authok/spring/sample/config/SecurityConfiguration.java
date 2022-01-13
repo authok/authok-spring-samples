@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,6 +42,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value(value = "${com.authok.clientSecret}")
     private String clientSecret;
 
+    private final LogoutHandler logoutHandler;
+
+    public SecurityConfiguration(LogoutHandler logoutHandler) {
+        this.logoutHandler = logoutHandler;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -50,33 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .and()
                 .logout()
                     .logoutUrl("/logout")
-                .addLogoutHandler(new LogoutHandler() {
-                    @Override
-                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-                        String returnUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
-                        if ((request.getScheme().equals("http") && request.getServerPort() != 80)
-                                || (request.getScheme().equals("https") && request.getServerPort() != 443)) {
-                            returnUrl += ":" + request.getServerPort();
-                        }
-                        returnUrl += "/logout_success";
-
-                        String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path("home")
-                                .build().toString();
-
-                        String logoutUrl =
-                                UriComponentsBuilder.fromHttpUrl(issuer + "logout?client_id={client_id}&return_to={return_to}")
-                                .encode()
-                                .buildAndExpand(clientId, returnUrl)
-                                .toUriString();
-
-                        try {
-                            response.sendRedirect(logoutUrl);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                })
+                    .addLogoutHandler(logoutHandler)
                     .and()
                 .authorizeRequests()
                     .mvcMatchers("/", "/home", "/login", "/callback").permitAll()
