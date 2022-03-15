@@ -6,10 +6,10 @@ spring:
           issuer-uri: https://${AUTHOK_DOMAIN}/
 
 application:
-  audience: {AUTHOK_AUDIENCE}
-  domain: {AUTHOK_DOMAIN}
-  client-id: {CLIENT_ID}
-  client-secret: {CLIENT_SECRET}
+  audience: ${AUTHOK_AUDIENCE}
+  domain: ${AUTHOK_DOMAIN}
+  client-id: ${CLIENT_ID}
+  client-secret: ${CLIENT_SECRET}
 
 server:
   port: 8083
