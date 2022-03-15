@@ -1,7 +1,7 @@
 application:
   audience: ${AUTHOK_AUDIENCE:}
-  client-id: ${CLIENT_ID:cbV4wesSiRu766WrYDkKcs73XktRYdCU}
-  client-secret: ${CLIENT_SECRET:iNVYaxqst9tzM3ipqR3Upet6eLZtI7UeD3wyD9bRNYU-N-ia51WcOhrtC5CQOcfx}
+  client-id: ${CLIENT_ID}
+  client-secret: ${CLIENT_SECRET}
   domain: ${AUTHOK_DOMAIN}
 server:
   error:
