@@ -3,7 +3,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: {https://$AUTHOK_DOMAIN}/}
+          issuer-uri: https://${AUTHOK_DOMAIN}/
 
 application:
   audience: {AUTHOK_AUDIENCE}
