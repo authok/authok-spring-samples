@@ -1,0 +1,20 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: {https://$AUTHOK_DOMAIN}/}
+
+application:
+  audience: {AUTHOK_AUDIENCE}
+  domain: {AUTHOK_DOMAIN}
+  client-id: {CLIENT_ID}
+  client-secret: {CLIENT_SECRET}
+
+server:
+  port: 8083
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security.oauth2.server: DEBUG

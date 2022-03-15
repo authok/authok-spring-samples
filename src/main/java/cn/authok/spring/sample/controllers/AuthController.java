@@ -20,10 +20,10 @@ public class AuthController {
     @Autowired
     private AuthenticationController authenticationController;
 
-    @Value(value = "${com.authok.domain}")
+    @Value(value = "${application.domain}")
     private String domain;
 
-    @Value(value = "${com.authok.clientId}")
+    @Value(value = "${application.client-id}")
     private String clientId;
 
     @GetMapping(value = "/login")

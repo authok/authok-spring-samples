@@ -15,31 +15,24 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    @Value("${authok.audience}")
+    @Value("${application.audience}")
     private String audience;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Value(value = "${com.authok.domain}")
+    @Value(value = "${application.domain}")
     private String domain;
 
-    @Value(value = "${com.authok.clientId}")
+    @Value(value = "${application.client-id}")
     private String clientId;
 
-    @Value(value = "${com.authok.clientSecret}")
+    @Value(value = "${application.client-secret}")
     private String clientSecret;
 
     private final LogoutHandler logoutHandler;
@@ -60,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .addLogoutHandler(logoutHandler)
                     .and()
                 .authorizeRequests()
-                    .mvcMatchers("/", "/home", "/login", "/callback").permitAll()
+                    .mvcMatchers("/", "/home", "/login", "/callback", "/logout/callback").permitAll()
                     .anyRequest().authenticated()
                     // .mvcMatchers(HttpMethod.GET, "/api/v1/contacts/**").authenticated() //.hasAuthority("SCOPE_read:contacts")
                     .and()

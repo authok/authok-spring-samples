@@ -16,10 +16,10 @@ public class AuthokLogoutHandler extends SecurityContextLogoutHandler {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Value(value = "${com.authok.domain}")
+    @Value(value = "${application.domain}")
     private String domain;
 
-    @Value(value = "${com.authok.clientId}")
+    @Value(value = "${application.client-id}")
     private String clientId;
 
     @Override
@@ -27,7 +27,7 @@ public class AuthokLogoutHandler extends SecurityContextLogoutHandler {
         super.logout(request, response, authentication);
 
         String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("home")
+                .path("logout/callback")
                 .build().toString();
 
         String logoutUrl =
