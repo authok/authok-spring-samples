@@ -3,44 +3,35 @@ package cn.authok.spring.sample.config;
 import com.auth0.AuthenticationController;
 import com.auth0.jwk.JwkProvider;
 import com.auth0.jwk.JwkProviderBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @EnableWebSecurity
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    @Value("${authok.audience}")
-    private String audience;
+    @Autowired
+    private OAuth2ResourceServerProperties resourceServerProps;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuer;
-
-    @Value(value = "${com.authok.domain}")
-    private String domain;
-
-    @Value(value = "${com.authok.clientId}")
+    @Value(value = "${application.client-id}")
     private String clientId;
 
-    @Value(value = "${com.authok.clientSecret}")
+    @Value(value = "${application.client-secret}")
     private String clientSecret;
+
+    @Value(value = "${application.domain}")
+    private String domain;
 
     private final LogoutHandler logoutHandler;
 
@@ -60,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .addLogoutHandler(logoutHandler)
                     .and()
                 .authorizeRequests()
-                    .mvcMatchers("/", "/home", "/login", "/callback").permitAll()
+                    .mvcMatchers("/", "/home", "/login", "/callback", "/logout/callback").permitAll()
                     .anyRequest().authenticated()
                     // .mvcMatchers(HttpMethod.GET, "/api/v1/contacts/**").authenticated() //.hasAuthority("SCOPE_read:contacts")
                     .and()
@@ -70,13 +61,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
-        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
+        String issuer = resourceServerProps.getJwt().getIssuerUri();
+        NimbusJwtDecoder decoder = JwtDecoders.fromOidcIssuerLocation(issuer);
+        // OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
-        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator(withIssuer, audienceValidator);
+        // OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator(withIssuer, audienceValidator);
 
-        jwtDecoder.setJwtValidator(withAudience);
-        return jwtDecoder;
+        decoder.setJwtValidator(withIssuer);
+        // jwtDecoder.setJwtValidator(withAudience);
+        return decoder;
     }
 
     @Bean

@@ -1,0 +1,31 @@
+application:
+  audience: ${AUTHOK_AUDIENCE:}
+  client-id: ${CLIENT_ID:cbV4wesSiRu766WrYDkKcs73XktRYdCU}
+  client-secret: ${CLIENT_SECRET:iNVYaxqst9tzM3ipqR3Upet6eLZtI7UeD3wyD9bRNYU-N-ia51WcOhrtC5CQOcfx}
+  domain: ${AUTHOK_DOMAIN}
+server:
+  error:
+    whitelabel:
+      enabled: false
+  port: ${PORT:8083}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security.oauth2.server: DEBUG
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java/
+  mvc:
+    throw-exception-if-no-handler-found: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://${AUTHOK_DOMAIN}/
+  web:
+    resources:
+      add-mappings: false

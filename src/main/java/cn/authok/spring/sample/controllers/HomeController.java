@@ -1,12 +1,13 @@
 package cn.authok.spring.sample.controllers;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("")
+@RequestMapping()
 public class HomeController {
     @GetMapping()
     public String index() {
@@ -15,6 +16,8 @@ public class HomeController {
 
     @GetMapping("/home")
     public String test() {
-        return "test";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        return String.format("当前登录用户ID: %s\n", principal);
     }
 }

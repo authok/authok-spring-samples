@@ -16,22 +16,23 @@ public class AuthokLogoutHandler extends SecurityContextLogoutHandler {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Value(value = "${com.authok.domain}")
+    @Value(value = "${application.domain}")
     private String domain;
 
-    @Value(value = "${com.authok.clientId}")
+    @Value(value = "${application.client-id}")
     private String clientId;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         super.logout(request, response, authentication);
 
+        // 退登成功后，authok会回调这个链接，请记得把以下链接配置在 [Authok管理后台] >> [应用] >> [URL设置] >> [允许的退登链接]
         String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("home")
+                .path("logout/callback")
                 .build().toString();
 
         String logoutUrl =
-                UriComponentsBuilder.fromHttpUrl(issuer + "logout?client_id={client_id}&return_to={return_to}")
+                UriComponentsBuilder.fromHttpUrl(issuer + "v1/logout?client_id={client_id}&return_to={return_to}")
                         .encode()
                         .buildAndExpand(clientId, returnTo)
                         .toUriString();
